@@ -17,6 +17,14 @@ export const signin = async (req, res) => {
   if (gender !== "male" && gender !== "female") {
     return res.status(400).json({ message: "Something went wrong" });
   }
+  const user = await prisma.user.findFirst({
+    where: {
+      email: email,
+    },
+  }); 
+  if (user) {
+    return res.status(400).json({ message: "User already exists" });
+  }
 
   const saltRounds = 10;
   const hashedPass = await bcrypt.hash(password, saltRounds);
