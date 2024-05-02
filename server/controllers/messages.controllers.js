@@ -56,16 +56,16 @@ export const getMessages = async (req, res) => {
   const { id: recieverId } = req.params;
   try {
     const conversations = await prisma.conversation.findMany({
-      where:{
-        participants:{
-          some:{
-            id:{
-              in:[req.user.id,recieverId]
-            }
-          }
-        }
+      where: {
+        participants: {
+          some: {
+            id: {
+              in: [req.user.id, recieverId],
+            },
+          },
+        },
       },
-      include: { messages: true }
+      include: { messages: true },
     });
     if (!conversations) {
       return res.status(404).json({ message: "No messages found" });

@@ -12,11 +12,11 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
+app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
-app.use("/message",messageRoutes)
-app.use("/users",userRoutes)
+app.use("/message", messageRoutes);
+app.use("/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello world");
@@ -24,5 +24,4 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
-}); 
- 
+});

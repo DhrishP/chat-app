@@ -21,7 +21,7 @@ export const signin = async (req, res) => {
     where: {
       email: email,
     },
-  }); 
+  });
   if (user) {
     return res.status(400).json({ message: "User already exists" });
   }
