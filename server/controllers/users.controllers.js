@@ -10,11 +10,16 @@ export const sidebarUsers = async (req, res) => {
           },
         },
       },
-      select: {
-        id: true,
-        username: true,
-        profileUrl: true,
-      },
+      select:{
+        password:false,
+        email:true,
+        username:true,
+        profileUrl:true,
+        id:true,
+        conversationsId:true,
+        createdAt:true,
+        updatedAt:true,
+      }
     });
     if (!users) {
       return res.status(404).json({ message: "No users found" });
