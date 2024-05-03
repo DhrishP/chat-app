@@ -1,34 +1,33 @@
-import { conversation, message, userData } from "@/types/globalstatetypes";
+import { message, userData } from "@/types/globalstatetypes";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 type GlobalState = {
-  conversation: conversation;
-  messages: message;
-  setUserData: (data: userData) => void;
-  setConversation: (data: conversation) => void;
-  setMessages: (data: message) => void;
+  conversationId: string;
+  conversationpfpUrl: string;
+  conversationName: string;
+  messages: message[];
+  setConversation: (data: string) => void;
+  setMessages: (data: message[]) => void;
+  setpfpUrl: (data: string) => void;
+  setName: (data: string) => void;
 };
 
 type UserDataLocal = {
   userData: userData | null;
   setUserData: (data: userData) => void;
-  
+  removeUserData: () => void;
 };
 
 export const useGlobalState = create<GlobalState>((set) => ({
-  conversation: {
-    participants: [],
-  }, // Fix: Change from [] to ''
-  messages: [],
-  setUserData: (data) => {
-    set((state) => {
-      localStorage.setItem("userData", JSON.stringify(data));
-      return { ...state, userData: data };
-    });
-  },
-  setConversation: (data) => set((state) => ({ ...state, conversation: data })),
+  conversationId: '',
+  conversationpfpUrl: '',
+  conversationName: '',
+  messages: [], // Fix: Change from {} to []
+  setConversation: (data) => set(() => ({ conversationId: data })),
   setMessages: (data) => set((state) => ({ ...state, messages: data })),
+  setpfpUrl: (data) => set(() => ({ conversationpfpUrl: data })),
+  setName: (data) => set(() => ({ conversationName: data })),
 }));
 
 export const useUserDataPersist = create(
@@ -36,10 +35,11 @@ export const useUserDataPersist = create(
     (set) => ({
       userData: null,
       setUserData: (data) => set((state) => ({ ...state, userData: data })),
+      removeUserData: () => set(() => ({ userData: null })),
     }),
     {
       name: "user-data", // unique name
-      storage:createJSONStorage(()=>sessionStorage), 
+      storage:createJSONStorage(()=>localStorage), 
     }
   ),
 );
