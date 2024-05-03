@@ -40,12 +40,12 @@ export const signin = async (req, res) => {
       gender,
       profileUrl: pfp,
     },
-    select:{
-      id:true,
-      email:true,
-      username:true,
-      profileUrl:true,
-    }
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      profileUrl: true,
+    },
   });
   if (response) {
     generateTokenandSetCookie(response.id, res);
@@ -56,7 +56,6 @@ export const signin = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
   if (!email || !password) {
     return res.status(400).json({ message: "Please fill in all fields" });
   }
@@ -64,12 +63,13 @@ export const login = async (req, res) => {
     where: {
       email,
     },
-    select:{
-      id:true,
-      email:true,
-      username:true,
-      profileUrl:true
-    }
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      profileUrl: true,
+      password: true,
+    },
   });
   if (!user) {
     return res.status(400).json({ message: "Invalid credentials" });
@@ -79,7 +79,13 @@ export const login = async (req, res) => {
     return res.status(400).json({ message: "Invalid credentials" });
   }
   generateTokenandSetCookie(user.id, res);
-  return res.status(200).json(user);
+  const noPassUser = {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    profileUrl: user.profileUrl,
+  };
+  return res.status(200).json(noPassUser);
 };
 
 export const logout = (req, res) => {
