@@ -1,5 +1,5 @@
-import { Link, redirect } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {useUserDataPersist} from "@/store/globalstate";
+import { useUserDataPersist } from "@/store/globalstate";
+import LoginFunction from "@/fetchers/login";
+import { useToast } from "./ui/use-toast";
 
 export default function LoginForm() {
-  const { userData } = useUserDataPersist();
+  const { userData, setUserData } = useUserDataPersist();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -26,11 +31,30 @@ export default function LoginForm() {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoading(true);
+    const res = await LoginFunction(email, password);
+    if (res.data) {
+      setUserData(res.data);
+      toast({
+        title: res.message,
+        variant: res.variant as "default" | "destructive" | null | undefined,
+      });
+      setLoading(false);
+      return;
+    }
+    toast({
+      title: res.message,
+      variant: res.variant as "default" | "destructive" | null | undefined,
+    });
+    setLoading(false);
   };
-  if (userData) redirect("/");
+  useEffect(() => {
+    if (userData?.email) {
+      navigate("/", { replace: true });
+    }
+  }, [userData]);
 
   return (
     <div className="flex h-screen w-screen items-center justify-center">
@@ -65,7 +89,7 @@ export default function LoginForm() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button disabled={loading} type="submit" className="w-full">
                 Login
               </Button>
             </div>
