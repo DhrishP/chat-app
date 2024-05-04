@@ -11,12 +11,14 @@ import GetMessagesFunction from "@/fetchers/get-messages";
 import SendMessageFunction from "@/fetchers/send-message";
 import { formatTimeFromISO } from "@/lib/change-iso-to-hours";
 import LogoutButton from "./logout-button";
+import { useSocketContext } from "@/context/socketContext";
 
 function Sidebar() {
   const [users, setUsers] = useState<sideBarUsers[]>([]);
   const { toast } = useToast();
   const { setConversation, conversationId, setMessages, setName, setpfpUrl } =
     useGlobalState();
+  const { onlineUsers } = useSocketContext();
 
   useEffect(() => {
     const getUsers = async () => {
@@ -56,44 +58,48 @@ function Sidebar() {
       </div>
       <div className="flex-1 overflow-auto">
         <nav className="grid gap-1 px-2 py-4">
-          {users.map((user) => (
-            <div
-              className={`flex items-center gap-3 rounded-md ${
-                conversationId === user.id
-                  ? "bg-yellow-400 hover:bg-gray-300"
-                  : "bg-gray-200 hover:bg-yellow-100"
-              } px-3  py-2 text-gray-900 transition-all cursor-pointer dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-700`}
-              onClick={() => {
-                setConversation(user.id);
-                setpfpUrl(user.profileUrl);
-                setName(user.username);
-              }}
-              key={user.id}
-            >
-              <Avatar>
-                <AvatarImage alt="Avatar" src={user.profileUrl} />
-                <AvatarFallback>{user.username}</AvatarFallback>
-               
-              </Avatar>
+          {users.map((user) => {
+            const isOnline = onlineUsers?.includes(user.id);
+            return (
               <div
-                  style={{
-                    position: "relative",
-                    bottom: 10,
-                    right: 20,
-                    width: "10px",
-                    height: "10px",
-                    borderRadius: "50%",
-                    backgroundColor: "green",
-                  }}
-                />
-              <div>
-                <span className="font-medium">{user.username}</span>
-                {/* <span className="text-sm text-gray-500 dark:text-gray-400">
+                className={`flex items-center gap-3 rounded-md ${
+                  conversationId === user.id
+                    ? "bg-yellow-400 hover:bg-gray-300"
+                    : "bg-gray-200 hover:bg-yellow-100"
+                } px-3  py-2 text-gray-900 transition-all cursor-pointer dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-700`}
+                onClick={() => {
+                  setConversation(user.id);
+                  setpfpUrl(user.profileUrl);
+                  setName(user.username);
+                }}
+                key={user.id}
+              >
+                <Avatar>
+                  <AvatarImage alt="Avatar" src={user.profileUrl} />
+                  <AvatarFallback>{user.username}</AvatarFallback>
+                </Avatar>
+                {isOnline && (
+                  <div
+                    style={{
+                      position: "relative",
+                      bottom: 10,
+                      right: 20,
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      backgroundColor: "green",
+                    }}
+                  />
+                )}
+                <div>
+                  <span className="font-medium">{user.username}</span>
+                  {/* <span className="text-sm text-gray-500 dark:text-gray-400">
                 {user.status}
               </span> */}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {/* <Link
             className="flex items-center gap-3 rounded-md bg-gray-200 px-3 py-2 text-gray-900 transition-all hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-700"
             to={""}

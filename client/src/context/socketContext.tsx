@@ -12,6 +12,16 @@ interface SocketContextType {
 
 const SocketContext = React.createContext<SocketContextType | null>(null);
 
+export const useSocketContext = () => {
+  const context = React.useContext(SocketContext);
+  if (!context) {
+    throw new Error(
+      "useSocketContext must be used within a SocketContextProvider"
+    );
+  }
+  return context;
+};
+
 export const SocketContextProvider = ({
   children,
 }: {
@@ -26,7 +36,17 @@ export const SocketContextProvider = ({
 
   useEffect(() => {
     if (userData) {
-      const newSocket = io("http://localhost:8000");
+      const newSocket = io("http://localhost:8000", {
+        query: {
+          userId: userData.id,
+        },
+      });
+      // newSocket.on("connect", () => {
+      //   console.log("connected to server", newSocket.id);
+      // });
+      newSocket.on("onlineUsers", (users: string[]) => {
+        setOnlineUsers(users);
+      });
       setSocket(newSocket);
       return () => {
         newSocket.close();
@@ -37,7 +57,7 @@ export const SocketContextProvider = ({
         setSocket(null);
       }
     }
-  }, []);
+  }, [userData]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>

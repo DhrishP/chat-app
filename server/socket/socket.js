@@ -11,11 +11,24 @@ const io = new Server(server,{
     }
 })
 
+
+let socketUserIdMap = {} //used to store of the online users using key-mapping userId:socket.id
+
 io.on('connection',(socket)=>{
     console.log(socket.id)
+    const userId = socket.handshake.query.userId
+    if(userId != 'undefined'){
+        socketUserIdMap[userId] = socket.id
+      
+    }
+
+    io.emit('onlineUsers',Object.keys(socketUserIdMap))
+    
 
     socket.on("disconect",()=>{
         console.log("A user disconeccted")
+        delete socketUserIdMap[userId]
+        io.emit('onlineUsers',Object.keys(socketUserIdMap))
     })
 })
 
