@@ -12,13 +12,21 @@ import SendMessageFunction from "@/fetchers/send-message";
 import { formatTimeFromISO } from "@/lib/change-iso-to-hours";
 import LogoutButton from "./logout-button";
 import { useSocketContext } from "@/context/socketContext";
+import useListenMessages from "@/hooks/useListen";
 
 function Sidebar() {
   const [users, setUsers] = useState<sideBarUsers[]>([]);
   const { toast } = useToast();
-  const { setConversation, conversationId, setMessages, setName, setpfpUrl } =
-    useGlobalState();
+  const {
+    setConversation,
+    conversationId,
+    setMessages,
+    setName,
+    setpfpUrl,
+    fetch,
+  } = useGlobalState();
   const { onlineUsers } = useSocketContext();
+  useListenMessages();
 
   useEffect(() => {
     const getUsers = async () => {
@@ -50,7 +58,7 @@ function Sidebar() {
       });
     };
     getMessages();
-  }, [conversationId]);
+  }, [conversationId, fetch]);
   return (
     <div className="flex h-full w-[300px] flex-col border-r bg-gray-100 dark:border-gray-800 dark:bg-gray-950">
       <div className="flex h-[60px] items-center justify-between border-b px-4">
@@ -125,17 +133,18 @@ function Chat() {
   const {
     conversationId,
     messages,
-    setMessages,
+
     conversationpfpUrl,
     conversationName,
+    toggleFetch,
   } = useGlobalState();
   const { userData } = useUserDataPersist();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const [fetch, setFetch] = useState(false);
-
-  console.log("messages", messages);
+  useListenMessages();
+  const { onlineUsers } = useSocketContext();
+  const isOnline = onlineUsers?.includes(conversationId);
 
   const handleSend = async () => {
     setLoading(true);
@@ -145,7 +154,7 @@ function Chat() {
     if (res.data) {
       setInput("");
       setLoading(false);
-      setFetch(!fetch);
+      toggleFetch();
       return;
     }
     toast({
@@ -154,22 +163,6 @@ function Chat() {
     });
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (!conversationId) return;
-    const getMessages = async () => {
-      const res = await GetMessagesFunction(conversationId);
-      if (res.data) {
-        setMessages(res.data);
-        return;
-      }
-      toast({
-        title: res.message,
-        variant: res.variant as "default" | "destructive" | null | undefined,
-      });
-    };
-    getMessages();
-  }, [conversationId, fetch]);
 
   if (!conversationId) {
     return (
@@ -180,17 +173,6 @@ function Chat() {
       </div>
     );
   }
-
-  // <div className="flex justify-end items-start gap-4">
-  //   <div className="max-w-[75%] rounded-lg bg-blue-500 p-3 text-sm text-white">
-  //     <p>I'm doing great, thanks for asking!</p>
-  //     <p className="mt-2 text-xs text-gray-200">10:31 AM</p>
-  //   </div>
-  //   <Avatar>
-  //     <AvatarImage alt="Avatar" src="/placeholder-user.jpg" />
-  //     <AvatarFallback>JD</AvatarFallback>
-  //   </Avatar>
-  // </div>;
   return (
     <>
       <div className="flex h-full flex-1 flex-col">
@@ -202,13 +184,13 @@ function Chat() {
             </Avatar>
             <div>
               <h3 className="font-medium">{conversationName}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Online</p>
+             {isOnline && <p className="text-sm text-gray-500 dark:text-gray-400">Online</p>}
             </div>
           </div>
         </div>
         <div className="flex-1 overflow-auto p-6">
           <div className="grid gap-4">
-            {messages ? (
+            {messages.length > 0 ? (
               messages.map((message: message) => (
                 <div
                   key={message.id}
@@ -234,8 +216,8 @@ function Chat() {
                   <div
                     className={`max-w-[75%] rounded-lg ${
                       message.senderId === userData?.id
-                        ? "bg-blue-500"
-                        : "bg-gray-400"
+                        ? "bg-primary"
+                        : "bg-yellow-400"
                     } p-3 text-sm text-white`}
                   >
                     <p>{message.message}</p>
@@ -276,7 +258,11 @@ function Chat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <Button onClick={handleSend} disabled={loading}>
+            <Button
+              className="bg-yellow-400 text-primary"
+              onClick={handleSend}
+              disabled={loading}
+            >
               Send
             </Button>
             <LogoutButton asChild={true}>

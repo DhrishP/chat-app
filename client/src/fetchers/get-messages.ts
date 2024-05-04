@@ -8,10 +8,16 @@ export default async function GetMessagesFunction(recieverId: string) {
     },
     credentials: "include",
   });
-  const data = await res.json();
-  console.log(data);
+
   if (!res.ok) {
     return { variant: "destructive", message: "Something went wrong" };
+  }
+  let data;
+  try {
+    data = await res.json();
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+    return { variant: "default", message: "Failed to parse JSON",data:[] as message[]};
   }
   return {
     variant: "default",

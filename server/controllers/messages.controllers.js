@@ -1,4 +1,5 @@
 import prisma from "../prisma/client.js";
+import { getRecieverSocketId, io } from "../socket/socket.js";
 
 export const sendMessage = async (req, res) => {
   const { id: recieverId } = req.params;
@@ -45,6 +46,11 @@ export const sendMessage = async (req, res) => {
     if (!newMessage) {
       return res.status(500).json({ message: "Failed to send message" });
     }
+    const recieverSocketId = getRecieverSocketId(recieverId);
+    if (recieverSocketId) {
+      io.to(recieverSocketId).emit("newMessage", newMessage);
+    }
+
     return res.status(200).json(newMessage);
   } catch (error) {
     console.log(error);
@@ -65,18 +71,20 @@ export const getMessages = async (req, res) => {
           },
         },
       },
-      include: { messages: {
-        select:{
-          message:true,
-          createdAt:true,
-          id:true,
-          senderId:true,
-          receiverId:true
-        }
-      } },
+      include: {
+        messages: {
+          select: {
+            message: true,
+            createdAt: true,
+            id: true,
+            senderId: true,
+            receiverId: true,
+          },
+        },
+      },
     });
     if (!conversations) {
-      return res.status(404).json({ message: "No messages found" });
+      return res.status(200).json([])
     }
     return res
       .status(200)

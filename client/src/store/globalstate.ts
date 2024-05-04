@@ -7,6 +7,8 @@ type GlobalState = {
   conversationpfpUrl: string;
   conversationName: string;
   messages: message[];
+  fetch:boolean
+  toggleFetch:()=>void
   setConversation: (data: string) => void;
   setMessages: (data: message[]) => void;
   setpfpUrl: (data: string) => void;
@@ -24,6 +26,8 @@ export const useGlobalState = create<GlobalState>((set) => ({
   conversationpfpUrl: '',
   conversationName: '',
   messages: [], // Fix: Change from {} to []
+  fetch:false,
+  toggleFetch:()=>set((state)=>({fetch:!state.fetch})), //this state is used to give useEffect a trigger to fetch messages on both the server side and reciever side
   setConversation: (data) => set(() => ({ conversationId: data })),
   setMessages: (data) => set((state) => ({ ...state, messages: data })),
   setpfpUrl: (data) => set(() => ({ conversationpfpUrl: data })),
