@@ -15,7 +15,8 @@ import LogoutButton from "./logout-button";
 function Sidebar() {
   const [users, setUsers] = useState<sideBarUsers[]>([]);
   const { toast } = useToast();
-  const { setConversation, conversationId, setMessages,setName,setpfpUrl } = useGlobalState();
+  const { setConversation, conversationId, setMessages, setName, setpfpUrl } =
+    useGlobalState();
 
   useEffect(() => {
     const getUsers = async () => {
@@ -72,7 +73,19 @@ function Sidebar() {
               <Avatar>
                 <AvatarImage alt="Avatar" src={user.profileUrl} />
                 <AvatarFallback>{user.username}</AvatarFallback>
+               
               </Avatar>
+              <div
+                  style={{
+                    position: "relative",
+                    bottom: 10,
+                    right: 20,
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    backgroundColor: "green",
+                  }}
+                />
               <div>
                 <span className="font-medium">{user.username}</span>
                 {/* <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -103,14 +116,19 @@ function Sidebar() {
 }
 
 function Chat() {
-  const { conversationId, messages ,setMessages , conversationpfpUrl ,conversationName} = useGlobalState();
+  const {
+    conversationId,
+    messages,
+    setMessages,
+    conversationpfpUrl,
+    conversationName,
+  } = useGlobalState();
   const { userData } = useUserDataPersist();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const [fetch, setFetch] = useState(false);
 
-  
   console.log("messages", messages);
 
   const handleSend = async () => {
@@ -130,7 +148,7 @@ function Chat() {
     });
     setLoading(false);
   };
-  
+
   useEffect(() => {
     if (!conversationId) return;
     const getMessages = async () => {
@@ -145,7 +163,7 @@ function Chat() {
       });
     };
     getMessages();
-  }, [conversationId,fetch]);
+  }, [conversationId, fetch]);
 
   if (!conversationId) {
     return (
@@ -184,9 +202,8 @@ function Chat() {
         </div>
         <div className="flex-1 overflow-auto p-6">
           <div className="grid gap-4">
-            {messages[0] ? (
-              // @ts-expect-error
-              messages[0].map((message: message) => (
+            {messages ? (
+              messages.map((message: message) => (
                 <div
                   key={message.id}
                   className={`flex ${
@@ -197,16 +214,16 @@ function Chat() {
                 >
                   {message.senderId !== userData?.id && (
                     <Avatar>
-                    <AvatarImage
-                      alt="Avatar"
-                      src={
-                        message.senderId === userData?.id
-                          ? userData.profileUrl
-                          : ""
-                      }
-                    />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
+                      <AvatarImage
+                        alt="Avatar"
+                        src={
+                          message.senderId === userData?.id
+                            ? userData.profileUrl
+                            : ""
+                        }
+                      />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
                   )}
                   <div
                     className={`max-w-[75%] rounded-lg ${
@@ -221,17 +238,17 @@ function Chat() {
                     </p>
                   </div>
                   {message.senderId === userData?.id && (
-                  <Avatar>
-                    <AvatarImage
-                      alt="Avatar"
-                      src={
-                        message.senderId === userData?.id
-                          ? userData.profileUrl
-                          : ""
-                      }
-                    />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
+                    <Avatar>
+                      <AvatarImage
+                        alt="Avatar"
+                        src={
+                          message.senderId === userData?.id
+                            ? userData.profileUrl
+                            : ""
+                        }
+                      />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
                   )}
                 </div>
               ))

@@ -5,10 +5,11 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { app ,server } from "./socket/socket.js";
 
 dotenv.config();
 
-const app = express();
+
 const PORT = process.env.PORT;
 app.use(cors({ origin: 'http://localhost:3000',credentials:true }));
 
@@ -24,6 +25,6 @@ app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });

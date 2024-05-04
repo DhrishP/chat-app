@@ -80,7 +80,7 @@ export const getMessages = async (req, res) => {
     }
     return res
       .status(200)
-      .json(conversations.map((message) => message.messages));
+      .json(conversations.map((message) => message.messages)[0]);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
