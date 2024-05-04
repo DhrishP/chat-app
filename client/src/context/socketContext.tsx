@@ -21,12 +21,12 @@ export const SocketContextProvider = ({
     typeof DefaultEventsMap,
     typeof DefaultEventsMap
   > | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<string[]|null>([]);
+  const [onlineUsers, setOnlineUsers] = useState<string[] | null>([]);
   const { userData } = useUserDataPersist();
 
   useEffect(() => {
     if (userData) {
-      const newSocket = io("http://localhost:5000");
+      const newSocket = io("http://localhost:8000");
       setSocket(newSocket);
       return () => {
         newSocket.close();
