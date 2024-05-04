@@ -14,14 +14,17 @@ export default async function LoginFunction(email: string, password: string) {
       message: "Please enter a valid email address",
     };
   }
-  const res = await fetch("http://localhost:8000/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({ email, password }),
-  });
+  const res = await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    }
+  );
   const data = await res.json();
   if (!res.ok) {
     return { variant: "destructive", message: "Something went wrong" };

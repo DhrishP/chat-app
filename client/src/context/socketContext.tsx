@@ -36,7 +36,7 @@ export const SocketContextProvider = ({
 
   useEffect(() => {
     if (userData) {
-      const newSocket = io("http://localhost:8000", {
+      const newSocket = io(`${import.meta.env.VITE_BACKEND_URL}`, {
         query: {
           userId: userData.id,
         },

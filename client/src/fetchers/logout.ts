@@ -1,11 +1,14 @@
 export default async function LogoutFunction() {
-  const res = await fetch("http://localhost:8000/api/auth/logout", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
+  const res = await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }
+  );
   const data = await res.json();
   if (!res.ok) {
     return { variant: "destructive", message: "Something went wrong" };

@@ -6,16 +6,16 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: [`${process.env.FRONTEND_URL}`],
     methods: ["GET", "POST"],
   },
 });
 
 let socketUserIdMap = {}; //used to store of the online users using key-mapping userId:socket.id
 
-export const getRecieverSocketId = (recieverId) =>{
-    return socketUserIdMap[recieverId]
-}
+export const getRecieverSocketId = (recieverId) => {
+  return socketUserIdMap[recieverId];
+};
 
 io.on("connection", (socket) => {
   console.log(socket.id);
@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
 
   io.emit("onlineUsers", Object.keys(socketUserIdMap));
 
-  socket.on("disconect", () => {
+  socket.on("disconnect", () => {
     console.log("A user disconeccted");
     delete socketUserIdMap[userId];
     io.emit("onlineUsers", Object.keys(socketUserIdMap));

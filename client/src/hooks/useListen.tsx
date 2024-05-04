@@ -12,9 +12,8 @@ const useListenMessages = () => {
       // newMessage.shouldShake = true;
       // const sound = new Audio(notificationSound);
       // sound.play();
-      if(messages.length>0){
       setMessages([...messages, newMessage]);
-      }
+
       toggleFetch();
     });
 

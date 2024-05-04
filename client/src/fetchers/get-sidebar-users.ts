@@ -1,13 +1,12 @@
 import { sideBarUsers } from "@/types/globalstatetypes";
 
 export default async function GetSidebarUsersFunction() {
-  const res = await fetch("http://localhost:8000/users/",{
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
     credentials: "include",
-  
   });
   const data = await res.json();
   console.log(data);
